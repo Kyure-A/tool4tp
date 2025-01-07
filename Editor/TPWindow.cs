@@ -10,7 +10,8 @@ namespace moe.kyre.tool4tp
     public class TPWindow : EditorWindow
     {
         private GameObject local;
-
+        private Vector2 scrollPos = Vector2.zero;
+        
         public struct BlendShape
         {
             public string name;
@@ -66,7 +67,8 @@ namespace moe.kyre.tool4tp
                     local = editorLocal;
                     UpdateBlendShapeNames(local);
                 }
-                
+
+                scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
                 for (int i = 0; i < blendShapes.Count; i++)
                 {
                     EditorGUILayout.BeginHorizontal();
@@ -82,7 +84,8 @@ namespace moe.kyre.tool4tp
                     EditorGUILayout.LabelField(blendShapes[i].name);
             
                     EditorGUILayout.EndHorizontal();
-                }                
+                }
+                EditorGUILayout.EndScrollView();
             }
         }
     }
