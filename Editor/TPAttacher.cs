@@ -15,12 +15,12 @@ namespace moe.kyre.tool4tp
             return;
         }
 
-        public static void BlendShapeSync (GameObject local, GameObject reference)
+        public static void BlendShapeSync (SkinnedMeshRenderer local, SkinnedMeshRenderer reference)
         {
-            GameObject avatar = nadena.dev.ndmf.runtime.RuntimeUtil.FindAvatarInParents(reference.transform).gameObject;
-            string relativePath = nadena.dev.ndmf.runtime.RuntimeUtil.RelativePath(avatar, local);
+            GameObject avatar = nadena.dev.ndmf.runtime.RuntimeUtil.FindAvatarInParents(reference.gameObject.transform).gameObject;
+            string relativePath = nadena.dev.ndmf.runtime.RuntimeUtil.RelativePath(avatar, reference.gameObject);
             
-            List<BlendshapeBinding> bindings = TPWindow.blendShapes
+            List<BlendshapeBinding> bindings = TPBlendShapeSyncWindow.blendShapes
                 .Select(blendshape => new BlendshapeBinding
                 {
                     ReferenceMesh = new AvatarObjectReference
@@ -31,7 +31,7 @@ namespace moe.kyre.tool4tp
                     LocalBlendshape = blendshape.name
                 }).ToList();
 
-            var component = local.AddComponent<ModularAvatarBlendshapeSync>();
+            var component = local.gameObject.AddComponent<ModularAvatarBlendshapeSync>();
 
             if (component != null)
             {

@@ -7,9 +7,10 @@ using VRC.SDK3.Avatars.Components;
 
 namespace moe.kyre.tool4tp
 {
-    public class TPWindow : EditorWindow
+    public class TPBlendShapeSyncWindow : EditorWindow
     {
-        private GameObject local;
+        private SkinnedMeshRenderer local = null;
+        private SkinnedMeshRenderer reference = null;
         private Vector2 scrollPos = Vector2.zero;
         
         public struct BlendShape
@@ -20,14 +21,11 @@ namespace moe.kyre.tool4tp
         
         public static List<BlendShape> blendShapes = new List<BlendShape>();
         
-        public void UpdateBlendShapeNames(GameObject local)
+        public void UpdateBlendShapeNames(SkinnedMeshRenderer local)
         {
             blendShapes = new List<BlendShape>();
             
-            var renderer = local.GetComponent<SkinnedMeshRenderer>();
-            if (renderer == null) return;
-            
-            Mesh mesh = renderer.sharedMesh;
+            Mesh mesh = local.sharedMesh;
             if (mesh == null) return;
 
             // for でかくのださいからもうちょい map とか使いたいけど
@@ -56,9 +54,19 @@ namespace moe.kyre.tool4tp
     
         private void OnGUI()
         {
-            EditorGUILayout.BeginHorizontal();        
-            var editorLocal = (GameObject)EditorGUILayout.ObjectField("Object", (GameObject)local, typeof(GameObject), true);        
-            EditorGUILayout.EndHorizontal();
+            var editorLocal = (SkinnedMeshRenderer)EditorGUILayout.ObjectField("舌ピアスなど", (SkinnedMeshRenderer)local, typeof(SkinnedMeshRenderer), true);
+            var editorReference = (SkinnedMeshRenderer)EditorGUILayout.ObjectField("元メッシュ", (SkinnedMeshRenderer)reference, typeof(SkinnedMeshRenderer), true);
+
+            if (local == null && editorLocal != null)
+            {
+                local = editorLocal;
+                UpdateBlendShapeNames(local);
+            }
+
+            if (reference == null && editorReference != null)
+            {
+                reference = editorReference;
+            }
             
             if (local != null)
             {
@@ -67,7 +75,7 @@ namespace moe.kyre.tool4tp
                     local = editorLocal;
                     UpdateBlendShapeNames(local);
                 }
-
+                
                 scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
                 for (int i = 0; i < blendShapes.Count; i++)
                 {
@@ -86,6 +94,14 @@ namespace moe.kyre.tool4tp
                     EditorGUILayout.EndHorizontal();
                 }
                 EditorGUILayout.EndScrollView();
+
+                if (reference != null)
+                {
+                    if (GUILayout.Button("設定する"))
+                    {
+                        TPAttacher.BlendShapeSync(editorLocal, reference);
+                    }
+                }
             }
         }
     }
