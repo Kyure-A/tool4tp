@@ -13,43 +13,12 @@ namespace moe.kyre.tool4tp
         private SkinnedMeshRenderer reference = null;
         private Vector2 scrollPos = Vector2.zero;
         
-        public struct BlendShape
-        {
-            public string name;
-            public int index;
-        }
+        public static List<BlendShape> blendShapes = new List<BlendShape>();        
         
-        public static List<BlendShape> blendShapes = new List<BlendShape>();
-        
-        public void UpdateBlendShapeNames(SkinnedMeshRenderer local)
-        {
-            blendShapes = new List<BlendShape>();
-            
-            Mesh mesh = local.sharedMesh;
-            if (mesh == null) return;
-
-            // for でかくのださいからもうちょい map とか使いたいけど
-            for (int i = 0; i < mesh.blendShapeCount; i++)
-            {
-                string name = mesh.GetBlendShapeName(i);
-                
-                blendShapes.Add(new BlendShape
-                {
-                    name = name,
-                    index = i,
-                });
-            }
-        }
-
-        public void RemoveBlendShapeNames(string name)
-        {
-            blendShapes.RemoveAll(x => x.name == name);
-        }        
-        
-        [MenuItem("Tools/Tool for make Tongue Piercing")]
+        [MenuItem("Tools/tool4tp/BlendShapeSync")]
         public static void ShowWindow()
         {
-            GetWindow<TPWindow>("tool4tp");
+            GetWindow<TPBlendShapeSyncWindow>("tool4tp/BlendShapeSync");
         }
     
         private void OnGUI()
@@ -60,7 +29,7 @@ namespace moe.kyre.tool4tp
             if (local == null && editorLocal != null)
             {
                 local = editorLocal;
-                UpdateBlendShapeNames(local);
+                blendShapes = TPBlendShapes.NewBlendShapes(local);
             }
 
             if (reference == null && editorReference != null)
@@ -73,11 +42,14 @@ namespace moe.kyre.tool4tp
                 if (local != editorLocal)
                 {
                     local = editorLocal;
-                    UpdateBlendShapeNames(local);
+                    blendShapes = TPBlendShapes.NewBlendShapes(local);
                 }
                 
                 scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
-                for (int i = 0; i < blendShapes.Count; i++)
+
+                var toRemove = new List<string>();
+                
+                foreach (var bs in blendShapes)
                 {
                     EditorGUILayout.BeginHorizontal();
             
@@ -85,16 +57,20 @@ namespace moe.kyre.tool4tp
             
                     if (!state)
                     {
-                        RemoveBlendShapeNames(blendShapes[i].name);
+                        toRemove.Add(bs.name);
+                        EditorGUILayout.EndHorizontal();
                         continue;
                     }
 
-                    EditorGUILayout.LabelField(blendShapes[i].name);
+                    EditorGUILayout.LabelField(bs.name);
             
                     EditorGUILayout.EndHorizontal();
                 }
+                
                 EditorGUILayout.EndScrollView();
 
+                foreach (var bs in toRemove) TPBlendShapes.RemoveBlendShapeByName(blendShapes, bs);
+                
                 if (reference != null)
                 {
                     if (GUILayout.Button("設定する"))
