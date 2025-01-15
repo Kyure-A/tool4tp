@@ -29,7 +29,7 @@ namespace moe.kyre.tool4tp
             if (local == null && editorLocal != null)
             {
                 local = editorLocal;
-                blendShapes = TPBlendShapes.NewBlendShapes(local);
+                blendShapes = TPBlendShapes.GetBlendShapes(local);
             }
 
             if (reference == null && editorReference != null)
@@ -42,7 +42,7 @@ namespace moe.kyre.tool4tp
                 if (local != editorLocal)
                 {
                     local = editorLocal;
-                    blendShapes = TPBlendShapes.NewBlendShapes(local);
+                    blendShapes = TPBlendShapes.GetBlendShapes(local);
                 }
                 
                 scrollPos = EditorGUILayout.BeginScrollView(scrollPos);

@@ -6,7 +6,7 @@ using nadena.dev.modular_avatar.core;
 using VRC.SDK3.Avatars.Components;
 
 namespace moe.kyre.tool4tp
-{
+{ 
     public struct BlendShape
     {
         public string name;
@@ -15,7 +15,9 @@ namespace moe.kyre.tool4tp
     
     public static class TPBlendShapes
     {
-        public static List<BlendShape> NewBlendShapes(SkinnedMeshRenderer local)
+        public static string[] Visemes = { "sil", "pp", "ff", "th", "dd", "kk", "ch", "ss", "nn", "rr", "aa", "e", "ih", "oh", "ou" };
+        
+        public static List<BlendShape> GetBlendShapes(SkinnedMeshRenderer local)
         {
             var blendShapes = new List<BlendShape>();
             
@@ -40,6 +42,20 @@ namespace moe.kyre.tool4tp
         public static void RemoveBlendShapeByName(List<BlendShape> blendShapes, string name)
         {
             blendShapes.RemoveAll(x => x.name == name);
+        }
+
+        public static bool isViseme(BlendShape blendShape)
+        {
+            for (int i = 0; i < Visemes.Length; i++)
+            {
+                // VRChat SDK (com.vrchat.base/Editor/VRCSDK/Dependencies/VRChat/Components/VRCAvatarDescriptorEditor.cs) を参照
+                if (blendShape.name.ToLowerInvariant() == "vrc.v_" + Visemes[i]) return true;
+                if (blendShape.name.ToLowerInvariant() == "v_" + Visemes[i]) return true;
+                if (blendShape.name.ToLowerInvariant().EndsWith(Visemes[i])) return true;
+                if (blendShape.name.ToLowerInvariant() == Visemes[i]) return true;
+            }
+            
+            return false;
         }
     }
 }
